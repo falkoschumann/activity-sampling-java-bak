@@ -1,0 +1,39 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+  id 'de.muspellheim.java-application-conventions'
+  id 'de.muspellheim.java-module-conventions'
+  id 'de.muspellheim.java-self-contained-application-conventions'
+}
+
+dependencies {
+  implementation 'org.apache.commons:commons-text:1.10.0'
+  implementation project(':activitysampling-domain')
+  implementation project(':activitysampling-infrastructure')
+  testImplementation project(path: ':activitysampling-domain', configuration: 'tests')
+}
+
+application {
+  mainModule = 'de.muspellheim.activitysampling.application'
+  mainClass = 'de.muspellheim.activitysampling.application.App'
+}
+
+if (Os.isFamily(Os.FAMILY_MAC)) {
+  jlink {
+    jpackage {
+      imageName = 'Activity Sampling'
+    }
+  }
+}
+
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+  jlink {
+    jpackage {
+      imageName = 'Activity Sampling'
+      installerName = 'activity-sampling'
+      installerOptions += [
+        '--win-upgrade-uuid', '2b558ea6-156a-4079-a351-f2cf6af85db5'
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+rootProject.name = 'activity-sampling'
+include(
+  'activitysampling-application',
+  'activitysampling-infrastructure',
+  'activitysampling-domain'
+)
