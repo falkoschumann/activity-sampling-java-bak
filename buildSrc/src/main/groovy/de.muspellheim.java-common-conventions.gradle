@@ -12,6 +12,7 @@ repositories {
 dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
   testImplementation 'org.hamcrest:hamcrest:2.2'
+  testImplementation "org.mockito:mockito-core:4.8.0"
 }
 
 version = rootProject.version
@@ -29,7 +30,7 @@ spotless {
     googleJavaFormat()
   }
 }
-
+/*
 task testJar(type: Jar, dependsOn: testClasses) {
   baseName = "test-${project.archivesBaseName}"
   from sourceSets.test.output
@@ -42,3 +43,4 @@ configurations {
 artifacts {
   tests testJar
 }
+*/

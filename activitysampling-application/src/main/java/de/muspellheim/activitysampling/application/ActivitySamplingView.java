@@ -1,39 +1,125 @@
 package de.muspellheim.activitysampling.application;
 
+import de.muspellheim.activitysampling.domain.*;
+import java.time.*;
 import java.util.*;
+import javafx.application.*;
+import javafx.fxml.*;
+import javafx.scene.control.*;
+import javafx.stage.*;
 
-public interface ActivitySamplingView {
-  void initDelegate(ActivitySamplingViewDelegate delegate);
+public class ActivitySamplingView {
+  @FXML private Stage stage;
+  @FXML private MenuBar menuBar;
+  @FXML private TextField activityText;
+  @FXML private Button logButton;
+  @FXML private Label countdownLabel;
+  @FXML private ProgressBar countdownProgress;
+  @FXML private ListView<String> recentActivities;
 
-  String getActivityText();
+  private final ActivitySamplingViewModel viewModel;
+  private final Notifier notifier;
+  private final Timer timer = new Timer("System clock", true);
 
-  void setActivityText(String text);
+  private CountdownTask countdownTask;
 
-  boolean isLogButtonEnabled();
+  public ActivitySamplingView(ActivitiesService model) {
+    viewModel = new ActivitySamplingViewModel(model);
+    notifier = new Notifier();
+    viewModel.onCountdownElapsed = notifier::displayNotification;
+  }
 
-  void setLogButtonEnabled(boolean enabled);
+  public static ActivitySamplingView create(Stage stage, ActivitiesService model) {
+    String file = "/fxml/ActivitySamplingView.fxml";
+    try {
+      var url = ActivitySamplingView.class.getResource(file);
+      var loader = new FXMLLoader(url);
+      loader.setRoot(stage);
+      loader.setControllerFactory(type -> new ActivitySamplingView(model));
+      loader.load();
+      return loader.getController();
+    } catch (Exception e) {
+      throw new IllegalStateException("Could not load view: " + file, e);
+    }
+  }
 
-  List<String> getRecentActivities();
+  @FXML
+  private void initialize() {
+    menuBar.setUseSystemMenuBar(true);
 
-  void setRecentActivities(List<String> activities);
+    stage.setOnCloseRequest(e -> notifier.dispose());
+    activityText.textProperty().bindBidirectional(viewModel.activityProperty());
+    logButton.disableProperty().bind(viewModel.logButtonDisabledProperty());
+    countdownLabel.textProperty().bind(viewModel.countdownTextProperty());
+    countdownProgress.progressProperty().bind(viewModel.countdownProgressProperty());
+    recentActivities.setItems(viewModel.getRecentActivities());
+  }
 
-  String getCountdownLabelText();
+  public void run() {
+    stage.show();
+    viewModel.run();
+  }
 
-  void setCountdownLabelText(String text);
+  @FXML
+  private void handleExit() {
+    Platform.exit();
+  }
 
-  int getCountdownProgressMaximum();
+  @FXML
+  private void handleStart5Min() {
+    startCountdown(Duration.ofMinutes(5));
+  }
 
-  void setCountdownProgressMaximum(int maximum);
+  @FXML
+  private void handleStart10Min() {
+    startCountdown(Duration.ofMinutes(10));
+  }
 
-  int getCountdownProgressValue();
+  @FXML
+  private void handleStart15Min() {
+    startCountdown(Duration.ofMinutes(15));
+  }
 
-  void setCountdownProgressValue(int value);
+  @FXML
+  private void handleStart20Min() {
+    startCountdown(Duration.ofMinutes(20));
+  }
 
-  void show();
+  @FXML
+  private void handleStart30Min() {
+    startCountdown(Duration.ofMinutes(30));
+  }
 
-  void startCountdown();
+  @FXML
+  private void handleStart60Min() {
+    startCountdown(Duration.ofMinutes(60));
+  }
 
-  void stopCountdown();
+  @FXML
+  private void handleStart1Min() {
+    startCountdown(Duration.ofMinutes(1));
+  }
 
-  void countdownElapsed();
+  private void startCountdown(Duration interval) {
+    viewModel.startCountdown(interval);
+    countdownTask = new CountdownTask();
+    timer.scheduleAtFixedRate(countdownTask, 0, 1000);
+  }
+
+  @FXML
+  private void handleStop() {
+    Optional.ofNullable(countdownTask).ifPresent(TimerTask::cancel);
+  }
+
+  @FXML
+  private void handleLog() {
+    viewModel.logActivity();
+  }
+
+  private class CountdownTask extends TimerTask {
+    @Override
+    public void run() {
+      Platform.runLater(viewModel::progressCountdown);
+    }
+  }
 }

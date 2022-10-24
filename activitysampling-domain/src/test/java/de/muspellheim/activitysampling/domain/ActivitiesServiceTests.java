@@ -2,6 +2,7 @@ package de.muspellheim.activitysampling.domain;
 
 import static org.hamcrest.MatcherAssert.*;
 
+import de.muspellheim.activitysampling.domain.tests.*;
 import java.time.*;
 import java.util.*;
 import org.hamcrest.collection.*;
