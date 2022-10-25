@@ -10,11 +10,33 @@ import javafx.collections.*;
 class ActivitySamplingViewModel {
   public Runnable onCountdownElapsed;
 
-  private final StringProperty activity =
+  private final StringProperty client =
       new SimpleStringProperty("") {
         @Override
         protected void invalidated() {
-          logButtonDisabled.set(activity.get().isBlank());
+          updateLogButtonDisabled();
+        }
+      };
+
+  private final StringProperty project =
+      new SimpleStringProperty("") {
+        @Override
+        protected void invalidated() {
+          updateLogButtonDisabled();
+        }
+      };
+  private final StringProperty task =
+      new SimpleStringProperty("") {
+        @Override
+        protected void invalidated() {
+          updateLogButtonDisabled();
+        }
+      };
+  private final StringProperty notes =
+      new SimpleStringProperty("") {
+        @Override
+        protected void invalidated() {
+          updateLogButtonDisabled();
         }
       };
   private final ReadOnlyBooleanWrapper logButtonDisabled = new ReadOnlyBooleanWrapper(true);
@@ -30,8 +52,20 @@ class ActivitySamplingViewModel {
     this.model = model;
   }
 
-  StringProperty activityProperty() {
-    return activity;
+  StringProperty clientProperty() {
+    return client;
+  }
+
+  StringProperty projectProperty() {
+    return project;
+  }
+
+  StringProperty taskProperty() {
+    return task;
+  }
+
+  StringProperty notesProperty() {
+    return notes;
   }
 
   ReadOnlyBooleanProperty logButtonDisabledProperty() {
@@ -50,12 +84,24 @@ class ActivitySamplingViewModel {
     return countdownProgress;
   }
 
+  private void updateLogButtonDisabled() {
+    logButtonDisabled.set(
+        client.get().isBlank()
+            || project.get().isBlank()
+            || task.get().isBlank()
+            || notes.get().isBlank());
+  }
+
   void run() {
     updateRecentActivities();
   }
 
   void logActivity() {
-    model.logActivity(activityProperty().get());
+    model.logActivity(
+        clientProperty().get(),
+        projectProperty().get(),
+        taskProperty().get(),
+        notesProperty().get());
     updateRecentActivities();
   }
 
@@ -74,7 +120,16 @@ class ActivitySamplingViewModel {
         rows.add(formattedDate);
       }
       var formattedTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime);
-      rows.add(formattedTime + " - " + activity.description());
+      rows.add(
+          formattedTime
+              + " - "
+              + activity.project()
+              + " ("
+              + activity.client()
+              + ") "
+              + activity.task()
+              + " - "
+              + activity.notes());
     }
     return rows;
   }

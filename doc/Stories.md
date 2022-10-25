@@ -19,16 +19,16 @@ file for easy evaluation.
 
 ## Evaluate Log
 
-- Show timesheets by period.
-- Show total timesheets by customer.
-- Show total timesheets by projects.
-- Show total timesheets by task.
-- Filter timesheets by client and project.
+- Show timesheet by period.
+- Show total timesheet by customer.
+- Show total timesheet by projects.
+- Show total timesheet by task.
+- Filter timesheet by client and project.
 
-## Export Timesheets
+## Export Timesheet
 
-- Export timesheets as a CSV file.
-- Export timesheets as a HTML file.
+- Export timesheet as a CSV file.
+- Export timesheet as an HTML file.
 
 ## Record missed Intervals
 

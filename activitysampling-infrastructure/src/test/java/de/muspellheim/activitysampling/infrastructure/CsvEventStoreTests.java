@@ -30,13 +30,27 @@ class CsvEventStoreTests {
   void recordAndReplay() {
     var eventStore = new CsvEventStore(file);
 
-    eventStore.record(new ActivityLoggedEvent(Instant.parse("2022-10-19T21:31:00Z"), "foo"));
-    eventStore.record(new ActivityLoggedEvent(Instant.parse("2022-10-19T21:32:00Z"), "bar"));
+    eventStore.record(
+        new ActivityLoggedEvent(
+            Instant.parse("2022-10-19T21:31:00Z"), "client 1", "project 1", "task 1", "notes 1"));
+    eventStore.record(
+        new ActivityLoggedEvent(
+            Instant.parse("2022-10-19T21:32:00Z"), "client 2", "project 2", "task 2", "notes 2"));
 
     assertThat(
         eventStore.replay(),
         contains(
-            new ActivityLoggedEvent(Instant.parse("2022-10-19T21:31:00Z"), "foo"),
-            new ActivityLoggedEvent(Instant.parse("2022-10-19T21:32:00Z"), "bar")));
+            new ActivityLoggedEvent(
+                Instant.parse("2022-10-19T21:31:00Z"),
+                "client 1",
+                "project 1",
+                "task 1",
+                "notes 1"),
+            new ActivityLoggedEvent(
+                Instant.parse("2022-10-19T21:32:00Z"),
+                "client 2",
+                "project 2",
+                "task 2",
+                "notes 2")));
   }
 }

@@ -13,8 +13,8 @@ class StubActivitiesService implements ActivitiesService {
   }
 
   @Override
-  public void logActivity(String description) {
-    var activity = new Activity(clock.instant(), description);
+  public void logActivity(String client, String project, String task, String notes) {
+    var activity = new Activity(clock.instant(), client, project, task, notes);
     allActivities.add(activity);
   }
 

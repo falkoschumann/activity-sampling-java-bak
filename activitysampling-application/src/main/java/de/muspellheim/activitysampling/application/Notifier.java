@@ -9,13 +9,15 @@ class Notifier {
     if (SystemTray.isSupported()) {
       EventQueue.invokeLater(
           () -> {
+            // Mac: 20x20
+            System.out.println("Tray Icon Size: " + SystemTray.getSystemTray().getTrayIconSize());
             var isRetina =
                 !GraphicsEnvironment.getLocalGraphicsEnvironment()
                     .getDefaultScreenDevice()
                     .getDefaultConfiguration()
                     .getDefaultTransform()
                     .isIdentity();
-            var imageUrl = isRetina ? "/icons/punch-clock@2.png" : "/icons/punch-clock.png";
+            var imageUrl = isRetina ? "/icons/punch-clock-40.png" : "/icons/punch-clock-20.png";
             var url = getClass().getResource(imageUrl);
             var image = Toolkit.getDefaultToolkit().getImage(url);
             var tray = SystemTray.getSystemTray();

@@ -23,26 +23,41 @@ class ActivitiesServiceTests {
 
   @Test
   void logFirstActivity() {
-    service.logActivity("foo");
+    service.logActivity("client", "project", "task", "description");
 
     assertThat(
         service.selectAllActivities(),
         IsIterableContainingInOrder.contains(
-            new Activity(Instant.parse("2022-10-18T21:44:00Z"), "foo")));
+            new Activity(
+                Instant.parse("2022-10-18T21:44:00Z"),
+                "client",
+                "project",
+                "task",
+                "description")));
   }
 
   @Test
   void logSecondActivity() {
-    service.logActivity("foo");
+    service.logActivity("client 1", "project 1", "task 1", "description 1");
     clock.tick();
 
-    service.logActivity("bar");
+    service.logActivity("client 2", "project 2", "task 2", "description 2");
 
     List<Activity> actual = service.selectAllActivities();
     assertThat(
         Collections.unmodifiableList(actual),
         IsIterableContainingInOrder.contains(
-            new Activity(Instant.parse("2022-10-18T21:44:00Z"), "foo"),
-            new Activity(Instant.parse("2022-10-18T21:45:00Z"), "bar")));
+            new Activity(
+                Instant.parse("2022-10-18T21:44:00Z"),
+                "client 1",
+                "project 1",
+                "task 1",
+                "description 1"),
+            new Activity(
+                Instant.parse("2022-10-18T21:45:00Z"),
+                "client 2",
+                "project 2",
+                "task 2",
+                "description 2")));
   }
 }

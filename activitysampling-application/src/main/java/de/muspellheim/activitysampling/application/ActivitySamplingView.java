@@ -6,12 +6,16 @@ import java.util.*;
 import javafx.application.*;
 import javafx.fxml.*;
 import javafx.scene.control.*;
+import javafx.scene.image.*;
 import javafx.stage.*;
 
 public class ActivitySamplingView {
   @FXML private Stage stage;
   @FXML private MenuBar menuBar;
-  @FXML private TextField activityText;
+  @FXML private TextField clientText;
+  @FXML private TextField projectText;
+  @FXML private ComboBox<String> taskCombo;
+  @FXML private TextField notesText;
   @FXML private Button logButton;
   @FXML private Label countdownLabel;
   @FXML private ProgressBar countdownProgress;
@@ -45,10 +49,35 @@ public class ActivitySamplingView {
 
   @FXML
   private void initialize() {
+    stage
+        .getIcons()
+        .addAll(
+            new Image(
+                Objects.requireNonNull(
+                    getClass().getResourceAsStream("/icons/punch-clock-16.png"))),
+            new Image(
+                Objects.requireNonNull(
+                    getClass().getResourceAsStream("/icons/punch-clock-32.png"))));
     menuBar.setUseSystemMenuBar(true);
+    taskCombo
+        .getItems()
+        .addAll(
+            "Analyze",
+            "Deployment",
+            "Design",
+            "Documentation",
+            "Maintenance",
+            "Meeting",
+            "Planing",
+            "Programming",
+            "Rework",
+            "Testing");
 
     stage.setOnCloseRequest(e -> notifier.dispose());
-    activityText.textProperty().bindBidirectional(viewModel.activityProperty());
+    clientText.textProperty().bindBidirectional(viewModel.clientProperty());
+    projectText.textProperty().bindBidirectional(viewModel.projectProperty());
+    taskCombo.valueProperty().bindBidirectional(viewModel.taskProperty());
+    notesText.textProperty().bindBidirectional(viewModel.notesProperty());
     logButton.disableProperty().bind(viewModel.logButtonDisabledProperty());
     countdownLabel.textProperty().bind(viewModel.countdownTextProperty());
     countdownProgress.progressProperty().bind(viewModel.countdownProgressProperty());
@@ -58,6 +87,7 @@ public class ActivitySamplingView {
   public void run() {
     stage.show();
     viewModel.run();
+    scrollRecentActivitiesToEnd();
   }
 
   @FXML
@@ -114,6 +144,11 @@ public class ActivitySamplingView {
   @FXML
   private void handleLog() {
     viewModel.logActivity();
+    scrollRecentActivitiesToEnd();
+  }
+
+  private void scrollRecentActivitiesToEnd() {
+    recentActivities.scrollTo(viewModel.getRecentActivities().size() - 1);
   }
 
   private class CountdownTask extends TimerTask {

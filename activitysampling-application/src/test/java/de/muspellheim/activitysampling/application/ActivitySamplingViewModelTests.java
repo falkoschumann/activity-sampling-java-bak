@@ -28,7 +28,10 @@ class ActivitySamplingViewModelTests {
     viewModel.run();
 
     assertAll(
-        () -> assertEquals("", viewModel.activityProperty().get(), "Activity"),
+        () -> assertEquals("", viewModel.clientProperty().get(), "Client"),
+        () -> assertEquals("", viewModel.projectProperty().get(), "Project"),
+        () -> assertEquals("", viewModel.taskProperty().get(), "Task"),
+        () -> assertEquals("", viewModel.notesProperty().get(), "Notes"),
         () -> assertTrue(viewModel.logButtonDisabledProperty().get(), "Log button disabled"),
         () -> assertEquals(List.of(), viewModel.getRecentActivities(), "Recent activities"));
   }
@@ -37,38 +40,165 @@ class ActivitySamplingViewModelTests {
   void run_RestoreView() {
     model.setAllActivities(
         List.of(
-            new Activity(Instant.parse("2022-10-20T19:09:00Z"), "Taste JavaScript"),
-            new Activity(Instant.parse("2022-10-20T19:29:00Z"), "Buy unicorn")));
+            new Activity(
+                Instant.parse("2022-10-20T19:09:00Z"),
+                "Muspellheim",
+                "Activity Sampling",
+                "Analyze",
+                "Taste JavaScript"),
+            new Activity(
+                Instant.parse("2022-10-20T19:29:00Z"),
+                "Muspellheim",
+                "Activity Sampling",
+                "Maintenance",
+                "Buy unicorn")));
 
     viewModel.run();
 
     assertAll(
-        () -> assertEquals("", viewModel.activityProperty().get(), "Activity"),
+        () -> assertEquals("", viewModel.clientProperty().get(), "Client"),
+        () -> assertEquals("", viewModel.projectProperty().get(), "Project"),
+        () -> assertEquals("", viewModel.taskProperty().get(), "Task"),
+        () -> assertEquals("", viewModel.notesProperty().get(), "Notes"),
         () -> assertTrue(viewModel.logButtonDisabledProperty().get(), "Log button disabled"),
         () ->
             assertEquals(
                 List.of(
                     "Donnerstag, 20. Oktober 2022",
-                    "21:09 - Taste JavaScript",
-                    "21:29 - Buy unicorn"),
+                    "21:09 - Activity Sampling (Muspellheim) Analyze - Taste JavaScript",
+                    "21:29 - Activity Sampling (Muspellheim) Maintenance - Buy unicorn"),
                 viewModel.getRecentActivities(),
                 "Recent activities"));
   }
 
   @Test
-  void activityTextChanged_LogButtonEnabledIfActivityTextIsNotEmpty() {
+  void logButtonEnabledIfFormIsNotEmpty() {
     viewModel.run();
 
-    viewModel.activityProperty().set("f");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("notes");
+    viewModel.clientProperty().set("client");
 
     assertFalse(viewModel.logButtonDisabledProperty().get());
   }
 
   @Test
-  void activityTextChanged_LogButtonDisabledIfActivityTextIsBlank() {
+  void logButtonDisabledIfFormIsEmpty() {
     viewModel.run();
 
-    viewModel.activityProperty().set(" ");
+    viewModel.projectProperty().set("");
+    viewModel.taskProperty().set("");
+    viewModel.notesProperty().set("");
+    viewModel.clientProperty().set("");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfFormIsBlank() {
+    viewModel.run();
+
+    viewModel.projectProperty().set("  ");
+    viewModel.taskProperty().set("  ");
+    viewModel.notesProperty().set("  ");
+    viewModel.clientProperty().set("  ");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfClientIsEmpty() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfClientIsBlank() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("  ");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfProjectIsEmpty() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfProjectIsBlank() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("  ");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfTaskIsEmpty() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfTaskIsBlank() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("  ");
+    viewModel.notesProperty().set("notes");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfNotesIsEmpty() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("");
+
+    assertTrue(viewModel.logButtonDisabledProperty().get());
+  }
+
+  @Test
+  void logButtonDisabledIfNotesIsBlank() {
+    viewModel.run();
+
+    viewModel.clientProperty().set("client");
+    viewModel.projectProperty().set("project");
+    viewModel.taskProperty().set("task");
+    viewModel.notesProperty().set("  ");
 
     assertTrue(viewModel.logButtonDisabledProperty().get());
   }
@@ -76,16 +206,24 @@ class ActivitySamplingViewModelTests {
   @Test
   void logActivity_AddNewActivityAndResetForm() {
     viewModel.run();
-    viewModel.activityProperty().set("Taste JavaScript");
+    viewModel.clientProperty().set("Muspellheim");
+    viewModel.projectProperty().set("Activity Sampling");
+    viewModel.taskProperty().set("Testing");
+    viewModel.notesProperty().set("Taste JavaScript");
 
     viewModel.logActivity();
 
     assertAll(
-        () -> assertEquals("Taste JavaScript", viewModel.activityProperty().get(), "Activity"),
+        () -> assertEquals("Muspellheim", viewModel.clientProperty().get(), "Client"),
+        () -> assertEquals("Activity Sampling", viewModel.projectProperty().get(), "Project"),
+        () -> assertEquals("Testing", viewModel.taskProperty().get(), "Task"),
+        () -> assertEquals("Taste JavaScript", viewModel.notesProperty().get(), "Notes"),
         () -> assertFalse(viewModel.logButtonDisabledProperty().get(), "Log button disabled"),
         () ->
             assertEquals(
-                List.of("Samstag, 22. Oktober 2022", "08:13 - Taste JavaScript"),
+                List.of(
+                    "Samstag, 22. Oktober 2022",
+                    "08:13 - Activity Sampling (Muspellheim) Testing - Taste JavaScript"),
                 viewModel.getRecentActivities(),
                 "Recent activities"));
   }

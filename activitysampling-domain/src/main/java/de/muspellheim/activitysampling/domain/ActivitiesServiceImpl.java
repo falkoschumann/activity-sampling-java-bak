@@ -18,8 +18,9 @@ public class ActivitiesServiceImpl implements ActivitiesService {
   }
 
   @Override
-  public void logActivity(String description) {
-    ActivityLoggedEvent event = new ActivityLoggedEvent(Instant.now(clock), description);
+  public void logActivity(String client, String project, String task, String notes) {
+    ActivityLoggedEvent event =
+        new ActivityLoggedEvent(Instant.now(clock), client, project, task, notes);
     eventStore.record(event);
   }
 
@@ -28,7 +29,14 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     return StreamSupport.stream(eventStore.replay().spliterator(), false)
         .filter((event -> event instanceof ActivityLoggedEvent))
         .map(event -> (ActivityLoggedEvent) event)
-        .map(event -> new Activity(event.timestamp(), event.activity()))
+        .map(
+            event ->
+                new Activity(
+                    event.timestamp(),
+                    event.client(),
+                    event.project(),
+                    event.task(),
+                    event.notes()))
         .toList();
   }
 }

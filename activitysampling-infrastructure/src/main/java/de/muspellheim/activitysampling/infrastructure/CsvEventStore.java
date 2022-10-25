@@ -10,7 +10,10 @@ import org.apache.commons.csv.*;
 
 public class CsvEventStore implements EventStore {
   public static final String COLUMN_TIMESTAMP = "Timestamp";
-  public static final String COLUMN_ACTIVITY = "Activity";
+  public static final String COLUMN_CLIENT = "Client";
+  public static final String COLUMN_PROJECT = "Project";
+  public static final String COLUMN_TASK = "Task";
+  public static final String COLUMN_NOTES = "Notes";
   private final Path file;
 
   public CsvEventStore(Path file) {
@@ -20,7 +23,8 @@ public class CsvEventStore implements EventStore {
   @Override
   public void record(Event event) {
     var formatBuilder =
-        CSVFormat.Builder.create(CSVFormat.RFC4180).setHeader(COLUMN_TIMESTAMP, COLUMN_ACTIVITY);
+        CSVFormat.Builder.create(CSVFormat.RFC4180)
+            .setHeader(COLUMN_TIMESTAMP, COLUMN_CLIENT, COLUMN_PROJECT, COLUMN_TASK, COLUMN_NOTES);
     if (Files.exists(file)) {
       formatBuilder.setSkipHeaderRecord(true);
     }
@@ -33,8 +37,13 @@ public class CsvEventStore implements EventStore {
                 StandardOpenOption.APPEND,
                 StandardOpenOption.CREATE),
             format)) {
-      var e = (ActivityLoggedEvent) event;
-      printer.printRecord(e.timestamp().truncatedTo(ChronoUnit.SECONDS), e.activity());
+      var customEvent = (ActivityLoggedEvent) event;
+      printer.printRecord(
+          customEvent.timestamp().truncatedTo(ChronoUnit.SECONDS),
+          customEvent.client(),
+          customEvent.project(),
+          customEvent.task(),
+          customEvent.notes());
     } catch (IOException e) {
       throw new IllegalStateException("Failed to record event into store.", e);
     }
@@ -44,7 +53,7 @@ public class CsvEventStore implements EventStore {
   public Iterable<? extends Event> replay() {
     var format =
         CSVFormat.Builder.create(CSVFormat.RFC4180)
-            .setHeader(COLUMN_TIMESTAMP, COLUMN_ACTIVITY)
+            .setHeader(COLUMN_TIMESTAMP, COLUMN_CLIENT, COLUMN_PROJECT, COLUMN_TASK, COLUMN_NOTES)
             .build();
     try (var parser = new CSVParser(Files.newBufferedReader(file), format)) {
       return parser.stream()
@@ -52,7 +61,11 @@ public class CsvEventStore implements EventStore {
           .map(
               record ->
                   new ActivityLoggedEvent(
-                      Instant.parse(record.get(COLUMN_TIMESTAMP)), record.get(COLUMN_ACTIVITY)))
+                      Instant.parse(record.get(COLUMN_TIMESTAMP)),
+                      record.get(COLUMN_CLIENT),
+                      record.get(COLUMN_PROJECT),
+                      record.get(COLUMN_TASK),
+                      record.get(COLUMN_NOTES)))
           .toList();
     } catch (NoSuchFileException e) {
       return List.of();

@@ -8,29 +8,16 @@ import javafx.stage.*;
 
 public class App extends Application {
   private ActivitiesServiceImpl activitiesService;
-  /*
-  public static void main(String[] args) {
-    var file = Paths.get(System.getProperty("user.home"), "activity-sampling.csv");
-    var eventStore = new CsvEventStore(file);
-    var model = new ActivitiesServiceImpl(eventStore);
-    SwingUtilities.invokeLater(
-        () -> {
-          var view = new SwingActivitySamplingView();
-          var controller = new ActivitySamplingController(model, view);
-          controller.run();
-        });
-  }
-  */
 
   @Override
-  public void init() throws Exception {
-    var file = Paths.get(System.getProperty("user.home"), "activity-sampling.csv");
+  public void init() {
+    var file = Paths.get(System.getProperty("user.home"), "activity-log.csv");
     var eventStore = new CsvEventStore(file);
     activitiesService = new ActivitiesServiceImpl(eventStore);
   }
 
   @Override
-  public void start(Stage primaryStage) throws Exception {
+  public void start(Stage primaryStage) {
     var controller = ActivitySamplingView.create(primaryStage, activitiesService);
     controller.run();
   }
