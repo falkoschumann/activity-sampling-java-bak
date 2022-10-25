@@ -1,7 +1,7 @@
 package de.muspellheim.activitysampling.application;
 
 import de.muspellheim.activitysampling.domain.*;
-import java.time.*;
+import java.time.Duration;
 import java.util.*;
 import javafx.application.*;
 import javafx.fxml.*;
@@ -19,7 +19,7 @@ public class ActivitySamplingView {
   @FXML private Button logButton;
   @FXML private Label countdownLabel;
   @FXML private ProgressBar countdownProgress;
-  @FXML private ListView<String> recentActivities;
+  @FXML private ListView<ActivityItem> recentActivities;
 
   private final ActivitySamplingViewModel viewModel;
   private final Notifier notifier;
@@ -82,6 +82,7 @@ public class ActivitySamplingView {
     countdownLabel.textProperty().bind(viewModel.countdownTextProperty());
     countdownProgress.progressProperty().bind(viewModel.countdownProgressProperty());
     recentActivities.setItems(viewModel.getRecentActivities());
+    recentActivities.setCellFactory(view -> new ActivityListCell(viewModel::setActivity));
   }
 
   public void run() {

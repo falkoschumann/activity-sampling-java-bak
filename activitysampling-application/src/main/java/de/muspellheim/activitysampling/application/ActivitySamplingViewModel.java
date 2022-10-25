@@ -8,7 +8,7 @@ import javafx.beans.property.*;
 import javafx.collections.*;
 
 class ActivitySamplingViewModel {
-  public Runnable onCountdownElapsed;
+  Runnable onCountdownElapsed;
 
   private final StringProperty client =
       new SimpleStringProperty("") {
@@ -42,13 +42,13 @@ class ActivitySamplingViewModel {
   private final ReadOnlyBooleanWrapper logButtonDisabled = new ReadOnlyBooleanWrapper(true);
   private final ReadOnlyStringWrapper countdownText = new ReadOnlyStringWrapper();
   private final ReadOnlyDoubleWrapper countdownProgress = new ReadOnlyDoubleWrapper();
-  private final ObservableList<String> recentActivities = FXCollections.observableArrayList();
+  private final ObservableList<ActivityItem> recentActivities = FXCollections.observableArrayList();
   private final ActivitiesService model;
 
   private Duration interval;
   private Duration countdown;
 
-  public ActivitySamplingViewModel(ActivitiesService model) {
+  ActivitySamplingViewModel(ActivitiesService model) {
     this.model = model;
   }
 
@@ -72,7 +72,7 @@ class ActivitySamplingViewModel {
     return logButtonDisabled.getReadOnlyProperty();
   }
 
-  ObservableList<String> getRecentActivities() {
+  ObservableList<ActivityItem> getRecentActivities() {
     return recentActivities;
   }
 
@@ -107,20 +107,20 @@ class ActivitySamplingViewModel {
 
   private void updateRecentActivities() {
     var activities = model.selectAllActivities();
-    var formattedActivities = formattedRecentActivities(activities);
-    recentActivities.setAll(formattedActivities);
+    var activityItems = createActivityItems(activities);
+    recentActivities.setAll(activityItems);
   }
 
-  private List<String> formattedRecentActivities(List<Activity> activities) {
-    var rows = new ArrayList<String>();
+  private List<ActivityItem> createActivityItems(List<Activity> activities) {
+    var rows = new ArrayList<ActivityItem>();
     for (var activity : activities) {
       var dateTime = LocalDateTime.ofInstant(activity.timestamp(), ZoneId.systemDefault());
       if (rows.isEmpty()) {
         var formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).format(dateTime);
-        rows.add(formattedDate);
+        rows.add(new ActivityItem(formattedDate));
       }
       var formattedTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime);
-      rows.add(
+      String text =
           formattedTime
               + " - "
               + activity.project()
@@ -129,9 +129,17 @@ class ActivitySamplingViewModel {
               + ") "
               + activity.task()
               + " - "
-              + activity.notes());
+              + activity.notes();
+      rows.add(new ActivityItem(text, activity));
     }
     return rows;
+  }
+
+  void setActivity(Activity activity) {
+    clientProperty().set(activity.client());
+    projectProperty().set(activity.project());
+    taskProperty().set(activity.task());
+    notesProperty().set(activity.notes());
   }
 
   void startCountdown(Duration interval) {
