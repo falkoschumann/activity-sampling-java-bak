@@ -1,7 +1,9 @@
 import java.time.LocalDate
 
 plugins {
+  id 'jacoco'
   id 'java'
+  id 'jvm-test-suite'
   id 'com.diffplug.spotless'
 }
 
@@ -21,8 +23,20 @@ ext {
   copyrightYear = LocalDate.now().year
 }
 
+testing {
+  suites {
+    test {
+      useJUnitJupiter()
+    }
+  }
+}
+
 test {
-  useJUnitPlatform()
+  finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+  dependsOn test
 }
 
 spotless {
