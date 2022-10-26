@@ -16,17 +16,26 @@ class ActivityListCell extends ListCell<ActivityItem> {
 
     if (empty || item == null) {
       setText(null);
+      setStyle(null);
       setGraphic(null);
+      setOnMouseClicked(null);
     } else {
       setText(item.text());
-      setOnMouseClicked(
-          e -> {
-            if (item.activity() == null || e.getClickCount() != 2) {
-              return;
-            }
+      if (item.activity() != null) {
+        // Activity
+        setStyle(null);
+        setOnMouseClicked(
+            e -> {
+              if (e.getClickCount() != 2) {
+                return;
+              }
 
-            onSelect.accept(item.activity());
-          });
+              onSelect.accept(item.activity());
+            });
+      } else {
+        // Section header
+        setStyle("-fx-font-weight: bold");
+      }
     }
   }
 }
