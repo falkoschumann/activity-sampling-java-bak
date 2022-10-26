@@ -12,15 +12,16 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     this(eventStore, Clock.systemDefaultZone());
   }
 
-  ActivitiesServiceImpl(EventStore eventStore, Clock clock) {
+  public ActivitiesServiceImpl(EventStore eventStore, Clock clock) {
     this.eventStore = eventStore;
     this.clock = clock;
   }
 
   @Override
-  public void logActivity(String client, String project, String task, String notes) {
+  public void logActivity(
+      String client, Duration duration, String project, String task, String notes) {
     ActivityLoggedEvent event =
-        new ActivityLoggedEvent(Instant.now(clock), client, project, task, notes);
+        new ActivityLoggedEvent(Instant.now(clock), duration, client, project, task, notes);
     eventStore.record(event);
   }
 
@@ -33,6 +34,7 @@ public class ActivitiesServiceImpl implements ActivitiesService {
             event ->
                 new Activity(
                     event.timestamp(),
+                    event.duration(),
                     event.client(),
                     event.project(),
                     event.task(),

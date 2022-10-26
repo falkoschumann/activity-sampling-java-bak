@@ -132,6 +132,7 @@ public class ActivitySamplingView {
   }
 
   private void startCountdown(Duration interval) {
+    stopCountdown();
     viewModel.startCountdown(interval);
     countdownTask = new CountdownTask();
     timer.scheduleAtFixedRate(countdownTask, 0, 1000);
@@ -139,6 +140,10 @@ public class ActivitySamplingView {
 
   @FXML
   private void handleStop() {
+    stopCountdown();
+  }
+
+  private void stopCountdown() {
     Optional.ofNullable(countdownTask).ifPresent(TimerTask::cancel);
   }
 

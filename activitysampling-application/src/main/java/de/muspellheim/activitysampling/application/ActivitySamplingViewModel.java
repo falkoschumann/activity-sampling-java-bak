@@ -45,7 +45,7 @@ class ActivitySamplingViewModel {
   private final ObservableList<ActivityItem> recentActivities = FXCollections.observableArrayList();
   private final ActivitiesService model;
 
-  private Duration interval;
+  private Duration interval = Duration.ofMinutes(20);
   private Duration countdown;
 
   ActivitySamplingViewModel(ActivitiesService model) {
@@ -99,6 +99,7 @@ class ActivitySamplingViewModel {
   void logActivity() {
     model.logActivity(
         clientProperty().get(),
+        interval,
         projectProperty().get(),
         taskProperty().get(),
         notesProperty().get());
@@ -112,12 +113,14 @@ class ActivitySamplingViewModel {
   }
 
   private List<ActivityItem> createActivityItems(List<Activity> activities) {
+    var date = LocalDate.ofEpochDay(0);
     var rows = new ArrayList<ActivityItem>();
     for (var activity : activities) {
       var dateTime = LocalDateTime.ofInstant(activity.timestamp(), ZoneId.systemDefault());
-      if (rows.isEmpty()) {
+      if (dateTime.toLocalDate().isAfter(date)) {
         var formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).format(dateTime);
         rows.add(new ActivityItem(formattedDate));
+        date = dateTime.toLocalDate();
       }
       var formattedTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(dateTime);
       String text =
@@ -150,11 +153,10 @@ class ActivitySamplingViewModel {
   }
 
   void progressCountdown() {
+    countdown = countdown.minusSeconds(1);
     if (countdown.isZero()) {
       Optional.ofNullable(onCountdownElapsed).ifPresent(Runnable::run);
       countdown = interval;
-    } else {
-      countdown = countdown.minusSeconds(1);
     }
     updateProgress();
   }

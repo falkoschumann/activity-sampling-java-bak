@@ -42,12 +42,14 @@ class ActivitySamplingViewModelTests {
         List.of(
             new Activity(
                 Instant.parse("2022-10-20T19:09:00Z"),
+                Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Analyze",
                 "Taste JavaScript"),
             new Activity(
-                Instant.parse("2022-10-20T19:29:00Z"),
+                Instant.parse("2022-10-21T19:29:00Z"),
+                Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Maintenance",
@@ -69,14 +71,17 @@ class ActivitySamplingViewModelTests {
                         "21:09 - Activity Sampling (Muspellheim) Analyze - Taste JavaScript",
                         new Activity(
                             Instant.parse("2022-10-20T19:09:00Z"),
+                            Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Analyze",
                             "Taste JavaScript")),
+                    new ActivityItem("Freitag, 21. Oktober 2022"),
                     new ActivityItem(
                         "21:29 - Activity Sampling (Muspellheim) Maintenance - Buy unicorn",
                         new Activity(
-                            Instant.parse("2022-10-20T19:29:00Z"),
+                            Instant.parse("2022-10-21T19:29:00Z"),
+                            Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Maintenance",
@@ -241,6 +246,7 @@ class ActivitySamplingViewModelTests {
                         "08:13 - Activity Sampling (Muspellheim) Testing - Taste JavaScript",
                         new Activity(
                             Instant.parse("2022-10-22T06:13:00Z"),
+                            Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Testing",
@@ -255,12 +261,14 @@ class ActivitySamplingViewModelTests {
         List.of(
             new Activity(
                 Instant.parse("2022-10-20T19:09:00Z"),
+                Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Analyze",
                 "Taste JavaScript"),
             new Activity(
                 Instant.parse("2022-10-20T19:29:00Z"),
+                Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Maintenance",
@@ -270,6 +278,7 @@ class ActivitySamplingViewModelTests {
     viewModel.setActivity(
         new Activity(
             Instant.parse("2022-10-20T19:09:00Z"),
+            Duration.ofMinutes(20),
             "Muspellheim",
             "Activity Sampling",
             "Analyze",
@@ -289,6 +298,7 @@ class ActivitySamplingViewModelTests {
                         "21:09 - Activity Sampling (Muspellheim) Analyze - Taste JavaScript",
                         new Activity(
                             Instant.parse("2022-10-20T19:09:00Z"),
+                            Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Analyze",
@@ -297,6 +307,7 @@ class ActivitySamplingViewModelTests {
                         "21:29 - Activity Sampling (Muspellheim) Maintenance - Buy unicorn",
                         new Activity(
                             Instant.parse("2022-10-20T19:29:00Z"),
+                            Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Maintenance",
@@ -352,11 +363,13 @@ class ActivitySamplingViewModelTests {
     viewModel.run();
     viewModel.startCountdown(Duration.ofMinutes(1));
 
-    tickCountdown(60);
+    tickCountdown(59);
 
     assertAll(
-        () -> assertEquals("00:00:00", viewModel.countdownTextProperty().get(), "Countdown text"),
-        () -> assertEquals(1.0, viewModel.countdownProgressProperty().get(), "Countdown progress"),
+        () -> assertEquals("00:00:01", viewModel.countdownTextProperty().get(), "Countdown text"),
+        () ->
+            assertEquals(
+                0.983, viewModel.countdownProgressProperty().get(), 0.001, "Countdown progress"),
         () -> verify(viewModel.onCountdownElapsed, times(0)).run());
   }
 
@@ -365,7 +378,7 @@ class ActivitySamplingViewModelTests {
     viewModel.run();
     viewModel.startCountdown(Duration.ofMinutes(1));
 
-    tickCountdown(61);
+    tickCountdown(60);
 
     assertAll(
         () -> assertEquals("00:01:00", viewModel.countdownTextProperty().get(), "Countdown text"),
