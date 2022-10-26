@@ -10,14 +10,25 @@ class Notifier {
       EventQueue.invokeLater(
           () -> {
             // Mac: 20x20
-            System.out.println("Tray Icon Size: " + SystemTray.getSystemTray().getTrayIconSize());
+            var trayIconSize = SystemTray.getSystemTray().getTrayIconSize();
             var isRetina =
                 !GraphicsEnvironment.getLocalGraphicsEnvironment()
                     .getDefaultScreenDevice()
                     .getDefaultConfiguration()
                     .getDefaultTransform()
                     .isIdentity();
-            var imageUrl = isRetina ? "/icons/punch-clock-40.png" : "/icons/punch-clock-20.png";
+            System.out.println("Tray icon size: " + trayIconSize + ", is retina: " + isRetina);
+            String imageUrl;
+            if (trayIconSize.height == 16) {
+              // Windows 10
+              imageUrl = isRetina ? "/icons/punch-clock-32.png" : "/icons/punch-clock-16.png";
+            } else if (trayIconSize.height == 20) {
+              // macOS 12
+              imageUrl = isRetina ? "/icons/punch-clock-40.png" : "/icons/punch-clock-20.png";
+            } else {
+              // Other OS
+              imageUrl = "/icons/punch-clock-16.png";
+            }
             var url = getClass().getResource(imageUrl);
             var image = Toolkit.getDefaultToolkit().getImage(url);
             var tray = SystemTray.getSystemTray();
