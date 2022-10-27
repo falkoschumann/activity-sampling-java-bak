@@ -5,20 +5,22 @@ file for easy evaluation.
 
 ## Log Activity
 
-- Ask user cyclically for current activity (default: every 20 minutes).
-- Archive timestamp, period, client, project, task and notes.
+- Ask user cyclically for current activity (e.g. every 20 minutes).
+- Archive timestamp, duration, client, project, task and notes.
 - Save log as CSV file.
 - Select one of the recent activities as the current one.
 - Correct activity record.
+- Can record missed Intervals.
 
 ## Parametrize Asking
 
-- Set the interval to 15, 20 (default), 30, or 60 minutes.
+- Set the interval to 15, 20, 30, or 60 minutes.
 - Enter first name and last name for timesheet.
-- Store capacity in hours per week (default: 40).
+- Store capacity in hours per week.
 
 ## Evaluate Log
 
+- Show summary: hours today, hours yesterday, hours this week, hours this month.
 - Show timesheet by period.
 - Show total timesheet by customer.
 - Show total timesheet by projects.
@@ -29,7 +31,3 @@ file for easy evaluation.
 
 - Export timesheet as a CSV file.
 - Export timesheet as an HTML file.
-
-## Record missed Intervals
-
-- Add manually untracked activities.
