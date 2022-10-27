@@ -41,19 +41,40 @@ class ActivitySamplingViewModelTests {
     model.setAllActivities(
         List.of(
             new Activity(
-                Instant.parse("2022-10-20T19:09:00Z"),
+                Instant.parse("2022-09-30T19:09:00Z"),
                 Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Analyze",
-                "Taste JavaScript"),
+                "Notes 1"),
             new Activity(
-                Instant.parse("2022-10-21T19:29:00Z"),
+                Instant.parse("2022-10-01T19:29:00Z"),
+                Duration.ofMinutes(20),
+                "Muspellheim",
+                "Activity Sampling",
+                "Design",
+                "Notes 2"),
+            new Activity(
+                Instant.parse("2022-10-17T19:29:00Z"),
+                Duration.ofMinutes(20),
+                "Muspellheim",
+                "Activity Sampling",
+                "Programming",
+                "Notes 3"),
+            new Activity(
+                Instant.parse("2022-10-21T19:09:00Z"),
+                Duration.ofMinutes(20),
+                "Muspellheim",
+                "Activity Sampling",
+                "Testing",
+                "Notes 4"),
+            new Activity(
+                Instant.parse("2022-10-22T19:29:00Z"),
                 Duration.ofMinutes(20),
                 "Muspellheim",
                 "Activity Sampling",
                 "Maintenance",
-                "Buy unicorn")));
+                "Notes 5")));
 
     viewModel.run();
 
@@ -66,28 +87,62 @@ class ActivitySamplingViewModelTests {
         () ->
             assertEquals(
                 List.of(
-                    new ActivityItem("Donnerstag, 20. Oktober 2022"),
+                    new ActivityItem("Freitag, 30. September 2022"),
                     new ActivityItem(
-                        "21:09 - Activity Sampling (Muspellheim) Analyze - Taste JavaScript",
+                        "21:09 - Activity Sampling (Muspellheim) Analyze - Notes 1",
                         new Activity(
-                            Instant.parse("2022-10-20T19:09:00Z"),
+                            Instant.parse("2022-09-30T19:09:00Z"),
                             Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Analyze",
-                            "Taste JavaScript")),
+                            "Notes 1")),
+                    new ActivityItem("Samstag, 1. Oktober 2022"),
+                    new ActivityItem(
+                        "21:29 - Activity Sampling (Muspellheim) Design - Notes 2",
+                        new Activity(
+                            Instant.parse("2022-10-01T19:29:00Z"),
+                            Duration.ofMinutes(20),
+                            "Muspellheim",
+                            "Activity Sampling",
+                            "Design",
+                            "Notes 2")),
+                    new ActivityItem("Montag, 17. Oktober 2022"),
+                    new ActivityItem(
+                        "21:29 - Activity Sampling (Muspellheim) Programming - Notes 3",
+                        new Activity(
+                            Instant.parse("2022-10-17T19:29:00Z"),
+                            Duration.ofMinutes(20),
+                            "Muspellheim",
+                            "Activity Sampling",
+                            "Programming",
+                            "Notes 3")),
                     new ActivityItem("Freitag, 21. Oktober 2022"),
                     new ActivityItem(
-                        "21:29 - Activity Sampling (Muspellheim) Maintenance - Buy unicorn",
+                        "21:09 - Activity Sampling (Muspellheim) Testing - Notes 4",
                         new Activity(
-                            Instant.parse("2022-10-21T19:29:00Z"),
+                            Instant.parse("2022-10-21T19:09:00Z"),
+                            Duration.ofMinutes(20),
+                            "Muspellheim",
+                            "Activity Sampling",
+                            "Testing",
+                            "Notes 4")),
+                    new ActivityItem("Samstag, 22. Oktober 2022"),
+                    new ActivityItem(
+                        "21:29 - Activity Sampling (Muspellheim) Maintenance - Notes 5",
+                        new Activity(
+                            Instant.parse("2022-10-22T19:29:00Z"),
                             Duration.ofMinutes(20),
                             "Muspellheim",
                             "Activity Sampling",
                             "Maintenance",
-                            "Buy unicorn"))),
+                            "Notes 5"))),
                 viewModel.getRecentActivities(),
-                "Recent activities"));
+                "Recent activities"),
+        () -> assertEquals("06:00", viewModel.hoursTodayProperty().get(), "Hours today"),
+        () -> assertEquals("08:00", viewModel.hoursYesterdayProperty().get(), "Hours yesterday"),
+        () -> assertEquals("22:00", viewModel.hoursThisWeekProperty().get(), "Hours this week"),
+        () -> assertEquals("100:00", viewModel.hoursThisMonthProperty().get(), "Hours this month"));
   }
 
   @Test

@@ -27,4 +27,15 @@ class StubActivitiesService implements ActivitiesService {
   public void setAllActivities(List<Activity> activities) {
     allActivities = activities;
   }
+
+  @Override
+  public List<Activity> selectRecentActivities(int numberOfDays) {
+    return allActivities;
+  }
+
+  @Override
+  public TimeSummary calculateTimeSummary() {
+    return new TimeSummary(
+        Duration.ofHours(6), Duration.ofHours(8), Duration.ofHours(22), Duration.ofHours(100));
+  }
 }

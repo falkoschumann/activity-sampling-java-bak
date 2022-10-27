@@ -43,6 +43,10 @@ class ActivitySamplingViewModel {
   private final ReadOnlyStringWrapper countdownText = new ReadOnlyStringWrapper();
   private final ReadOnlyDoubleWrapper countdownProgress = new ReadOnlyDoubleWrapper();
   private final ObservableList<ActivityItem> recentActivities = FXCollections.observableArrayList();
+  private final ReadOnlyStringWrapper hoursToday = new ReadOnlyStringWrapper("00:00");
+  private final ReadOnlyStringWrapper hoursYesterday = new ReadOnlyStringWrapper("00:00");
+  private final ReadOnlyStringWrapper hoursThisWeek = new ReadOnlyStringWrapper("00:00");
+  private final ReadOnlyStringWrapper hoursThisMonth = new ReadOnlyStringWrapper("00:00");
   private final ActivitiesService model;
 
   private Duration interval = Duration.ofMinutes(20);
@@ -72,16 +76,32 @@ class ActivitySamplingViewModel {
     return logButtonDisabled.getReadOnlyProperty();
   }
 
+  ReadOnlyStringProperty countdownTextProperty() {
+    return countdownText.getReadOnlyProperty();
+  }
+
+  ReadOnlyDoubleProperty countdownProgressProperty() {
+    return countdownProgress.getReadOnlyProperty();
+  }
+
   ObservableList<ActivityItem> getRecentActivities() {
     return recentActivities;
   }
 
-  ReadOnlyStringProperty countdownTextProperty() {
-    return countdownText;
+  ReadOnlyStringProperty hoursTodayProperty() {
+    return hoursToday.getReadOnlyProperty();
   }
 
-  ReadOnlyDoubleProperty countdownProgressProperty() {
-    return countdownProgress;
+  ReadOnlyStringProperty hoursYesterdayProperty() {
+    return hoursYesterday.getReadOnlyProperty();
+  }
+
+  ReadOnlyStringProperty hoursThisWeekProperty() {
+    return hoursThisWeek.getReadOnlyProperty();
+  }
+
+  ReadOnlyStringProperty hoursThisMonthProperty() {
+    return hoursThisMonth.getReadOnlyProperty();
   }
 
   private void updateLogButtonDisabled() {
@@ -93,7 +113,7 @@ class ActivitySamplingViewModel {
   }
 
   void run() {
-    updateRecentActivities();
+    loadView();
   }
 
   void logActivity() {
@@ -103,11 +123,16 @@ class ActivitySamplingViewModel {
         projectProperty().get(),
         taskProperty().get(),
         notesProperty().get());
+    loadView();
+  }
+
+  private void loadView() {
     updateRecentActivities();
+    updateTimeSummary();
   }
 
   private void updateRecentActivities() {
-    var activities = model.selectAllActivities();
+    var activities = model.selectRecentActivities(31);
     var activityItems = createActivityItems(activities);
     recentActivities.setAll(activityItems);
   }
@@ -136,6 +161,23 @@ class ActivitySamplingViewModel {
       rows.add(new ActivityItem(text, activity));
     }
     return rows;
+  }
+
+  void updateTimeSummary() {
+    var timeSummary = model.calculateTimeSummary();
+    String timeFormat = "%1$02d:%2$02d";
+    hoursToday.set(
+        timeFormat.formatted(
+            timeSummary.hoursToday().toHours(), timeSummary.hoursToday().toMinutesPart()));
+    hoursYesterday.set(
+        timeFormat.formatted(
+            timeSummary.hoursYesterday().toHours(), timeSummary.hoursYesterday().toMinutesPart()));
+    hoursThisWeek.set(
+        timeFormat.formatted(
+            timeSummary.hoursThisWeek().toHours(), timeSummary.hoursThisWeek().toMinutesPart()));
+    hoursThisMonth.set(
+        timeFormat.formatted(
+            timeSummary.hoursThisMonth().toHours(), timeSummary.hoursThisMonth().toMinutesPart()));
   }
 
   void setActivity(Activity activity) {

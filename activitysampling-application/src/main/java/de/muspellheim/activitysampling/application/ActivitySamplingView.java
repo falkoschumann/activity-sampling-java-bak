@@ -20,6 +20,10 @@ public class ActivitySamplingView {
   @FXML private Label countdownLabel;
   @FXML private ProgressBar countdownProgress;
   @FXML private ListView<ActivityItem> recentActivities;
+  @FXML private Label hoursTodayLabel;
+  @FXML private Label hoursYesterdayLabel;
+  @FXML private Label hoursThisWeekLabel;
+  @FXML private Label hoursThisMonthLabel;
 
   private final ActivitySamplingViewModel viewModel;
   private final Notifier notifier;
@@ -83,6 +87,10 @@ public class ActivitySamplingView {
     countdownProgress.progressProperty().bind(viewModel.countdownProgressProperty());
     recentActivities.setItems(viewModel.getRecentActivities());
     recentActivities.setCellFactory(view -> new ActivityListCell(viewModel::setActivity));
+    hoursTodayLabel.textProperty().bind(viewModel.hoursTodayProperty());
+    hoursYesterdayLabel.textProperty().bind(viewModel.hoursYesterdayProperty());
+    hoursThisWeekLabel.textProperty().bind(viewModel.hoursThisWeekProperty());
+    hoursThisMonthLabel.textProperty().bind(viewModel.hoursThisMonthProperty());
   }
 
   public void run() {

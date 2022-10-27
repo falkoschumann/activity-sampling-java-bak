@@ -96,6 +96,10 @@ class AcceptanceTest {
                     "Maintenance",
                     "Buy unicorn"))),
         viewModel.getRecentActivities());
+    assertEquals("00:30", viewModel.hoursTodayProperty().get());
+    assertEquals("00:00", viewModel.hoursYesterdayProperty().get());
+    assertEquals("00:30", viewModel.hoursThisWeekProperty().get());
+    assertEquals("00:30", viewModel.hoursThisMonthProperty().get());
   }
 
   private void tickCountdown(Duration duration) {
